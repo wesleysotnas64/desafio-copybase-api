@@ -4,46 +4,80 @@ import { DatabasePostgres } from './database-postgres.js'
 const server = fastify();
 const database = new DatabasePostgres;
 
-server.post('/video', async (request, reply) => {
+server.post('/desafio-copybase', async (request, reply) => {
 
-    const { title, description, duration } = request.body;
+    const assinantes = request.body;
 
-    await database.create({
-        title,
-        description,
-        duration,
-    });
+    for (const assinante of assinantes) {
+
+        const {
+            quantidade_cobrancas,
+            cobrada_a_cada_dias,
+            data_inicio,
+            status,
+            data_status,
+            data_cancelamento,
+            valor,
+            proximo_ciclo,
+            id_assinante,
+        } = assinante;
+
+        await database.create({
+            quantidade_cobrancas,
+            cobrada_a_cada_dias,
+            data_inicio,
+            status,
+            data_status,
+            data_cancelamento,
+            valor,
+            proximo_ciclo,
+            id_assinante,
+        });
+
+    }
 
     return reply.status(201).send();
 });
 
-server.get('/video', async () => {
-    const videos = await database.list();
+server.get('/desafio-copybase', async () => {
+    const assinantes = await database.list();
 
-    return videos;
+    return assinantes;
 });
 
-server.put('/video/:id', async (request, reply) => {
-    const videoId = request.params.id;
+server.put('/desafio-copybase', async (request, reply) => {
 
-    const { title, description, duration } = request.body;
+    const {
+        quantidade_cobrancas,
+        cobrada_a_cada_dias,
+        data_inicio,
+        status,
+        data_status,
+        data_cancelamento,
+        valor,
+        proximo_ciclo,
+        id_assinante,
+    } = request.body;
 
-    await database.update(
-        videoId,
-        {
-            title,
-            description,
-            duration,
-        }
-    );
+    await database.update({
+        quantidade_cobrancas,
+        cobrada_a_cada_dias,
+        data_inicio,
+        status,
+        data_status,
+        data_cancelamento,
+        valor,
+        proximo_ciclo,
+        id_assinante,
+    });
 
     return reply.status(204).send();
 });
 
-server.delete('/video/:id', async (request, reply) => {
-    const videoId = request.params.id;
+server.delete('/desafio-copybase/:id', async (request, reply) => {
+    const id_assinante = request.params.id;
 
-    await database.delete(videoId);
+    await database.delete(id_assinante);
 
     return reply.status(204).send();
 });
@@ -51,4 +85,5 @@ server.delete('/video/:id', async (request, reply) => {
 server.listen({
     host: "0.0.0.0",
     port: process.env.PORT ?? 3333,
+    // port: 3333,
 });
