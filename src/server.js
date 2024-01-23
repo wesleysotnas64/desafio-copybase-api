@@ -1,21 +1,14 @@
 import { fastify } from 'fastify'
 import { DatabasePostgres } from './database-postgres.js'
+import festifyCors from '@fastify/cors'
 
 const server = fastify();
 const database = new DatabasePostgres;
 
-// Middleware para habilitar CORS
-server.addHook('onRequest', (request, reply, done) => {
-    // Permitir solicitações de qualquer origem
-    reply.header('Access-Control-Allow-Origin', '*');
-    // Permitir os métodos de solicitação especificados (GET, POST, PUT, DELETE)
-    reply.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-    // Permitir os cabeçalhos especificados
-    reply.header('Access-Control-Allow-Headers', 'Content-Type');
-  
-    // Continue para a rota ou manipulador seguinte
-    done();
-  });
+server.register(festifyCors, {
+    origin: true,
+    methods: ['POST', 'GET', 'PUT', 'DELETE'],
+});
 
 server.post('/desafio-copybase', async (request, reply) => {
 
