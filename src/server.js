@@ -11,7 +11,7 @@ server.register(festifyCors, {
 });
 
 server.post('/desafio-copybase', async (request, reply) => {
-
+    
     const assinantes = request.body;
 
     for (const assinante of assinantes) {
@@ -51,6 +51,50 @@ server.get('/desafio-copybase', async () => {
     return assinantes;
 });
 
+server.get('/desafio-copybase/revenue-from-year-and-month/:year/:month', async (request, reply) => {
+    const { year, month } = request.params;
+
+    const revenue = await database.revenueFromYearAnMonth({ year, month });
+    return revenue;
+});
+
+server.get('/desafio-copybase/revenue-from-year/:year', async (request, reply) => {
+    const year = request.params.year;
+
+    const revenue = await database.revenueFromYear(year);
+    return revenue;
+});
+
+server.get('/desafio-copybase/churn-rate-from-year-and-month/:year/:month', async (request, reply) => {
+    const { year, month } = request.params;
+
+    const churnRate = await database.churnRateFromYearAnMonth({ year, month });
+    return churnRate;
+});
+
+server.get('/desafio-copybase/churn-rate-from-year/:year', async (request, reply) => {
+    const year = request.params.year;
+
+    const churnRate = await database.churnRateFromYear(year);
+    return churnRate;
+});
+
+server.get('/desafio-copybase/churn-rate-all-months-from-year/:year', async (request, reply) => {
+    const year = request.params.year;
+    const churnRates = [];
+
+    for (let month = 1; month <= 12; month++) {
+        const response = await database.churnRateFromYearAnMonth({ year, month });
+        churnRates.push({
+            churnRate: response.churnRate,
+            numeroCancelamentos: response.numeroCancelamentos,
+            numeroAssinantesInicial: response.numeroAssinantesInicial
+        });
+    }
+
+    return churnRates;
+});
+
 server.put('/desafio-copybase', async (request, reply) => {
 
     const {
@@ -84,6 +128,12 @@ server.delete('/desafio-copybase/:id', async (request, reply) => {
     const id_assinante = request.params.id;
 
     await database.delete(id_assinante);
+
+    return reply.status(204).send();
+});
+
+server.delete('/desafio-copybase/delete-all', async (request, reply) => {
+    await database.deleteAll();
 
     return reply.status(204).send();
 });

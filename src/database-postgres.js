@@ -1,3 +1,4 @@
+import { calcularChurnRate, calcularMRR } from './calc-metrics.js';
 import { sql } from './db.js'
 
 export class DatabasePostgres{
@@ -79,4 +80,65 @@ export class DatabasePostgres{
             delete from dados_copybase where id_assinante = ${id_assinante};
         `;
     }
+
+    async deleteAll () {
+        await sql`
+            delete from dados_copybase;
+        `;
+    }
+
+    async revenueFromYearAnMonth (date) {
+
+        const {
+            year,
+            month
+        } = date;
+
+        const assinantes = await sql`
+            select *
+            from dados_copybase
+            where extract(year from data_inicio) = ${year}
+            and extract(month from data_inicio) = ${month};
+        `;
+
+        return calcularMRR(assinantes);
+
+    }
+
+    async revenueFromYear (year) {
+        const assinantes = await sql`
+            select *
+            from dados_copybase
+            where extract(year from data_inicio) = ${year};
+        `;
+
+        return calcularMRR(assinantes);
+    }
+
+    async churnRateFromYearAnMonth(date) {
+        const {
+            year,
+            month
+        } = date;
+
+        const assinantes = await sql`
+            select *
+            from dados_copybase
+            where extract(year from data_inicio) = ${year}
+            and extract(month from data_inicio) = ${month};
+        `;
+
+        return calcularChurnRate(assinantes);
+    }
+
+    async churnRateFromYear (year) {
+        const assinantes = await sql`
+            select *
+            from dados_copybase
+            where extract(year from data_inicio) = ${year};
+        `;
+
+        return calcularChurnRate(assinantes);
+    }
+
 }
